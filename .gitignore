@@ -1,0 +1,43 @@
+# Visual Studio / .NET Core
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+out/
+
+# Rider IDE
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# ASP.NET Core files
+wwwroot/uploads/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# JetBrains Rider
+.idea/
+
+# EF Core Migrations (optional, if you want to track manually)
+Migrations/
+
+# Others
+*.vsix
+*.cache

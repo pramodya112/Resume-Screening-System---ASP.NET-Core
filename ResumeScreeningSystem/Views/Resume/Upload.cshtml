@@ -1,0 +1,32 @@
+﻿@{
+    ViewBag.Title = "Upload Resume";
+}
+
+<h2>Upload Resume for Job: @ViewBag.JobTitle</h2>
+<p class="text-muted">Job Posting ID: @ViewBag.JobPostingId</p>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<form asp-action="Upload" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="jobPostingId" value="@ViewBag.JobPostingId" />
+
+    <div class="mb-3">
+        <label class="form-label">Select Resume File</label>
+        <input type="file" name="resumeFile" class="form-control" accept=".pdf,.doc,.docx" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Upload</button>
+    <a asp-controller="JobPosting" asp-action="Index" class="btn btn-secondary">Back to Job Postings</a>
+</form>

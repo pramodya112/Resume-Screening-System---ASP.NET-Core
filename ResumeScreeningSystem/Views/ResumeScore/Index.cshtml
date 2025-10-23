@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Analyze Resume";
+}
+
+<div class="card shadow p-4">
+    <h2>Resume Screening</h2>
+    <hr />
+    <form asp-action="Analyze" method="post">
+        <div class="mb-3">
+            <label class="form-label">Select Job Posting</label>
+            <select class="form-select" name="jobId" required>
+                <option value="">-- Choose Job --</option>
+                @foreach (var job in ViewBag.JobPostings)
+                {
+                    <option value="@job.Id">@job.JobTitle</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Select Resume</label>
+            <select class="form-select" name="resumeId" required>
+                <option value="">-- Choose Resume --</option>
+                @foreach (var resume in ViewBag.Resumes)
+                {
+                    <option value="@resume.Id">@resume.CandidateName</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Analyze Resume</button>
+    </form>
+</div>
