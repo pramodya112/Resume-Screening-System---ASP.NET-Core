@@ -1,32 +1,189 @@
 ﻿@{
     ViewBag.Title = "Upload Resume";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Upload Resume for Job: @ViewBag.JobTitle</h2>
-<p class="text-muted">Job Posting ID: @ViewBag.JobPostingId</p>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-4">
+            <a asp-controller="JobPosting" asp-action="Index" class="btn btn-outline-secondary me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="mb-1">Upload Resume</h2>
+                <p class="text-muted mb-0">Submit your application for this position</p>
+            </div>
+        </div>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["Error"]
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Job Information Card -->
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-briefcase-fill"></i> Job Position
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-2 text-muted small">JOB TITLE</p>
+                        <h5 class="mb-0">@ViewBag.JobTitle</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2 text-muted small">JOB ID</p>
+                        <h5 class="mb-0">
+                            <span class="badge bg-primary">#@ViewBag.JobPostingId</span>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Form Card -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <i class="bi bi-cloud-upload-fill"></i> Upload Your Resume
+            </div>
+            <div class="card-body">
+                <form asp-action="Upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <input type="hidden" name="jobPostingId" value="@ViewBag.JobPostingId" />
+
+                    <div class="upload-area mb-4">
+                        <div class="upload-icon">
+                            <i class="bi bi-file-earmark-arrow-up"></i>
+                        </div>
+                        <h5 class="mb-2">Select Resume File</h5>
+                        <p class="text-muted mb-3">Drag and drop or click to browse</p>
+                        <input type="file"
+                               name="resumeFile"
+                               id="resumeFile"
+                               class="form-control"
+                               accept=".pdf,.doc,.docx"
+                               required
+                               onchange="updateFileName()" />
+                        <div id="fileName" class="mt-3 text-primary fw-bold"></div>
+                    </div>
+
+                    <div class="alert alert-info d-flex align-items-start mb-4">
+                        <i class="bi bi-info-circle me-2" style="font-size: 1.25rem;"></i>
+                        <div>
+                            <strong>Accepted Formats:</strong> PDF, DOC, DOCX<br />
+                            <small>Maximum file size: 5MB</small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-controller="JobPosting" asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="uploadBtn">
+                            <i class="bi bi-cloud-upload"></i> Upload Resume
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Instructions Card -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h6 class="mb-3">
+                    <i class="bi bi-lightbulb text-warning"></i> Application Tips
+                </h6>
+                <ul class="mb-0 text-muted small">
+                    <li>Ensure your resume is up-to-date with your latest experience</li>
+                    <li>Use a clear and professional format</li>
+                    <li>Include relevant keywords from the job description</li>
+                    <li>Keep your resume concise (1-2 pages recommended)</li>
+                    <li>Proofread for any spelling or grammar errors</li>
+                </ul>
+            </div>
+        </div>
     </div>
-}
+</div>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["Success"]
-    </div>
-}
+<style>
+    .upload-area {
+        border: 3px dashed var(--border-color);
+        border-radius: 1rem;
+        padding: 3rem 2rem;
+        text-align: center;
+        background: var(--bg-light);
+        transition: all 0.3s ease;
+    }
 
-<form asp-action="Upload" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="jobPostingId" value="@ViewBag.JobPostingId" />
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
 
-    <div class="mb-3">
-        <label class="form-label">Select Resume File</label>
-        <input type="file" name="resumeFile" class="form-control" accept=".pdf,.doc,.docx" required />
-    </div>
+    .upload-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
 
-    <button type="submit" class="btn btn-primary">Upload</button>
-    <a asp-controller="JobPosting" asp-action="Index" class="btn btn-secondary">Back to Job Postings</a>
-</form>
+    .upload-area input[type="file"] {
+        cursor: pointer;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .card-header {
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .border-primary {
+        border: 2px solid rgba(37, 99, 235, 0.3) !important;
+    }
+
+    .bg-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+    }
+
+    #fileName {
+        min-height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<script>
+    function updateFileName() {
+        const input = document.getElementById('resumeFile');
+        const fileNameDiv = document.getElementById('fileName');
+
+        if (input.files.length > 0) {
+            const fileName = input.files[0].name;
+            const fileSize = (input.files[0].size / 1024 / 1024).toFixed(2);
+            fileNameDiv.innerHTML = `
+                <i class="bi bi-file-earmark-check"></i>
+                ${fileName} (${fileSize} MB)
+            `;
+        } else {
+            fileNameDiv.innerHTML = '';
+        }
+    }
+
+    // Form submission loading state
+    document.getElementById('uploadForm').addEventListener('submit', function() {
+        const btn = document.getElementById('uploadBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+    });
+</script>

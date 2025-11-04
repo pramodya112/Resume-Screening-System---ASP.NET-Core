@@ -11,5 +11,6 @@
         public Recruiter? Recruiter { get; set; } // "Recruiter?" added to make surre that there should be a rectruiter to post the job description
 
         public ICollection<Resume>? Resumes { get; set; } // Navigation property for related resumes
+        public ICollection<Resumescore>? ResumeScoresList { get; set; }
     }
 }

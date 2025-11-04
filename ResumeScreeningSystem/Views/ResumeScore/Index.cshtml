@@ -1,33 +1,66 @@
 ﻿@{
-    ViewData["Title"] = "Analyze Resume";
+    ViewData["Title"] = "AI Resume Screening";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="card shadow p-4">
-    <h2>Resume Screening</h2>
-    <hr />
-    <form asp-action="Analyze" method="post">
-        <div class="mb-3">
-            <label class="form-label">Select Job Posting</label>
-            <select class="form-select" name="jobId" required>
-                <option value="">-- Choose Job --</option>
-                @foreach (var job in ViewBag.JobPostings)
-                {
-                    <option value="@job.Id">@job.JobTitle</option>
-                }
-            </select>
-        </div>
+<div class="container py-5">
+    <h2 class="text-center mb-5">AI Resume Screening</h2>
 
-        <div class="mb-3">
-            <label class="form-label">Select Resume</label>
-            <select class="form-select" name="resumeId" required>
-                <option value="">-- Choose Resume --</option>
-                @foreach (var resume in ViewBag.Resumes)
-                {
-                    <option value="@resume.Id">@resume.CandidateName</option>
-                }
-            </select>
-        </div>
+    <form asp-action="AnalyzeAll" method="post" class="card shadow p-4 mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-8">
+                <label class="form-label fw-bold">Select Job Posting</label>
+                <select name="jobId" class="form-select form-select-lg" required onchange="toggleButtons(this)">
+                    <option value="">-- Choose a Job --</option>
+                    @foreach (var job in ViewBag.JobPostings)
+                    {
+                        <option value="@job.Id">@job.JobTitle</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4 d-grid">
+                <button type="submit" class="btn btn-success btn-lg" id="analyzeBtn" disabled>
+                    Analyze All Resumes
+                </button>
 
-        <button type="submit" class="btn btn-primary">Analyze Resume</button>
+                <script>
+    document.querySelector('form').addEventListener('submit', function () {
+        const btn = document.getElementById('analyzeBtn');
+        const text = document.getElementById('btnText');
+        const spinner = document.getElementById('spinner');
+        btn.disabled = true;
+        text.classList.add('d-none');
+        spinner.classList.remove('d-none');
+    });
+</script>
+
+            </div>
+        </div>
     </form>
+
+    <div class="text-center">
+        <form asp-action="Results" method="get" id="viewForm">
+            <input type="hidden" name="jobId" id="viewJobId" />
+            <button type="submit" class="btn btn-outline-primary btn-lg" id="viewBtn" disabled>
+                View All Scores
+            </button>
+        </form>
+    </div>
 </div>
+
+<script>
+    function toggleButtons(select) {
+        const jobId = select.value;
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const viewBtn = document.getElementById('viewBtn');
+        const viewInput = document.getElementById('viewJobId');
+        if (jobId) {
+            analyzeBtn.disabled = false;
+            viewBtn.disabled = false;
+            viewInput.value = jobId;
+        } else {
+            analyzeBtn.disabled = true;
+            viewBtn.disabled = true;
+        }
+    }
+</script>

@@ -1,35 +1,154 @@
-﻿@model ResumeScreeningSystem.Models.Recruiter
+﻿@model ResumeScreeningSystem.Models.JobPosting
 
 @{
-    ViewData["Title"] = "Edit Recruiter";
+    ViewData["Title"] = "Edit Job Posting";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit Recruiter</h2>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-4">
+            <a asp-action="Index" class="btn btn-outline-secondary me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="mb-1">Edit Job Posting</h2>
+                <p class="text-muted mb-0">Update the job posting details</p>
+            </div>
+        </div>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
 
-    <div class="form-group mb-3">
-        <label asp-for="RecruiterName" class="form-label"></label>
-        <input asp-for="RecruiterName" class="form-control" />
-        <span asp-validation-for="RecruiterName" class="text-danger"></span>
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <i class="bi bi-pencil-fill"></i> Edit Job Details
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="RecruiterId" />
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="bi bi-tag-fill"></i> Job Title
+                        </label>
+                        <input asp-for="JobTitle"
+                               class="form-control form-control-lg"
+                               placeholder="e.g., Senior Software Engineer" />
+                        <span asp-validation-for="JobTitle" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="bi bi-file-text-fill"></i> Job Description
+                        </label>
+                        <textarea asp-for="JobDescription"
+                                  class="form-control"
+                                  rows="8"
+                                  placeholder="Enter detailed job description, requirements, responsibilities, and qualifications..."></textarea>
+                        <span asp-validation-for="JobDescription" class="text-danger"></span>
+                        <small class="text-muted">Provide a comprehensive description to help candidates understand the role</small>
+                    </div>
+
+                    <div class="alert alert-info d-flex align-items-start">
+                        <i class="bi bi-info-circle me-2" style="font-size: 1.25rem;"></i>
+                        <div>
+                            <strong>Note:</strong> The assigned recruiter cannot be changed after creation.
+                            Current recruiter: <strong>@Model.Recruiter?.RecruiterName</strong>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Update Job Posting
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <i class="bi bi-calendar3 text-primary" style="font-size: 2rem;"></i>
+                        <p class="mb-0 mt-2 text-muted small">Job ID</p>
+                        <strong>#@Model.Id</strong>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <i class="bi bi-person text-success" style="font-size: 2rem;"></i>
+                        <p class="mb-0 mt-2 text-muted small">Recruiter</p>
+                        <strong>@Model.Recruiter?.RecruiterName</strong>
+                    </div>
+                    <div class="col-md-4">
+                        <i class="bi bi-files text-info" style="font-size: 2rem;"></i>
+                        <p class="mb-0 mt-2 text-muted small">Applications</p>
+                        <a asp-controller="Resume" asp-action="Index" asp-route-jobPostingId="@Model.Id" class="btn btn-sm btn-outline-primary mt-1">
+                            View Resumes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
+<style>
+    .form-control-lg, .form-select-lg {
+        font-size: 1rem;
+        padding: 0.875rem 1rem;
+    }
 
-    <div class="form-group mb-3">
-        <label asp-for="password" class="form-label"></label>
-        <input asp-for="password" type="password" class="form-control" />
-        <span asp-validation-for="password" class="text-danger"></span>
-    </div>
+    .card {
+        border: none;
+        margin-bottom: 1.5rem;
+    }
 
-    <button type="submit" class="btn btn-success">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+    .card-header {
+        background: linear-gradient(135deg, var(--warning-color), #d97706);
+        color: white;
+        font-weight: 600;
+        font-size: 1.125rem;
+        padding: 1rem 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .form-label i {
+            color: var(--primary-color);
+        }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 150px;
+    }
+
+    .btn i {
+        margin-right: 0.25rem;
+    }
+
+    .alert-info {
+        background-color: #e0f2fe;
+        color: #075985;
+        border-left: 4px solid #0ea5e9;
+    }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

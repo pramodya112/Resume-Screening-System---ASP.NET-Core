@@ -17,7 +17,9 @@ namespace ResumeScreeningSystem.Controllers
 
         public IActionResult Index()
         {
-            var Recruiters = _context.recruiters.ToList();
+            var Recruiters = _context.recruiters
+                .Include (r=> r.JobPostings)
+                .ToList();
             return View(Recruiters);
         }
 

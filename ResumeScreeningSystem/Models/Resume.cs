@@ -19,9 +19,9 @@ namespace ResumeScreeningSystem.Models
 
         public JobPosting? JobPosting { get; set; }
 
-        public Resumescore? ResumeScore { get; set; }
-
-
+        //public Resumescore? ResumeScore { get; set; } (single)
+      
+        public ICollection<Resumescore>? ResumeScoresList { get; set; } //(collection)  
 
     }
 }
