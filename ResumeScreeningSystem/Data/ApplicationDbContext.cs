@@ -11,7 +11,7 @@ namespace ResumeScreeningSystem.Data
 
         }
 
-        public DbSet<Recruiter> recruiters { get; set; } 
+        public DbSet<Recruiter> recruiters { get; set; }
         public DbSet<JobPosting> jobPostings { get; set; }
         public DbSet<Resume> resumes { get; set; }
 
@@ -20,18 +20,18 @@ namespace ResumeScreeningSystem.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+
 
             modelBuilder.Entity<JobPosting>().ToTable("jobPostings");
             modelBuilder.Entity<Resume>().ToTable("resumes");
             modelBuilder.Entity<Resumescore>().ToTable("resumescore");
 
-            //Resume to JobPosting relationship (Many-to-One)
+            //Resume to JobPosting relationship (Many-to-One)    ("The Fluent API- To define the rules and relationships between your tables that standard C# properties might miss.)
             modelBuilder.Entity<Resume>()
                 .HasOne(r => r.JobPosting)
                 .WithMany(j => j.Resumes)
                 .HasForeignKey(r => r.JobPostingId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict); //you cant deleta a job posting if there are resumes associated with it
 
             //ResumeScore to Resume relationship (Many-to-One)
             modelBuilder.Entity<Resumescore>()
@@ -46,6 +46,8 @@ namespace ResumeScreeningSystem.Data
                 .WithMany(jp => jp.ResumeScoresList)
                 .HasForeignKey(rs => rs.JobPostingId)
                 .OnDelete(DeleteBehavior.Restrict); //or Cascade based on your requirement
+
+
         }
     }
-}
+} 

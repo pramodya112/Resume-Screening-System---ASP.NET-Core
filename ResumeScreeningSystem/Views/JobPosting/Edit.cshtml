@@ -5,150 +5,556 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="d-flex align-items-center mb-4">
-            <a asp-action="Index" class="btn btn-outline-secondary me-3">
-                <i class="bi bi-arrow-left"></i>
-            </a>
-            <div>
-                <h2 class="mb-1">Edit Job Posting</h2>
-                <p class="text-muted mb-0">Update the job posting details</p>
-            </div>
-        </div>
+<style>
+    .edit-job-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
 
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show">
-                @TempData["Error"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+    .page-header {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border-radius: 16px;
+        padding: 40px;
+        margin-bottom: 35px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -150px;
+            right: -100px;
         }
 
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <i class="bi bi-pencil-fill"></i> Edit Job Details
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .btn-back {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+            color: white;
+        }
+
+    .header-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        backdrop-filter: blur(10px);
+    }
+
+    .page-header h2 {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+        font-size: 15px;
+        opacity: 0.95;
+        margin: 8px 0 0 0;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+
+    .alert i {
+        font-size: 20px;
+    }
+
+    .btn-close {
+        margin-left: auto;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+    }
+
+    .form-section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .form-section-title i {
+            color: #f59e0b;
+            font-size: 20px;
+        }
+
+    .form-group {
+        margin-bottom: 28px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+
+        .form-label i {
+            color: #f59e0b;
+            font-size: 16px;
+        }
+
+    .form-control {
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        width: 100%;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .form-control-lg {
+        padding: 16px 18px;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .form-control:focus {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+        outline: none;
+        background: white;
+    }
+
+    .form-control::placeholder {
+        color: #cbd5e1;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 180px;
+        line-height: 1.6;
+    }
+
+    .text-danger {
+        color: #dc2626;
+        font-size: 13px;
+        margin-top: 6px;
+        display: block;
+        font-weight: 500;
+    }
+
+    .helper-text {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .helper-text i {
+            color: #94a3b8;
+        }
+
+    .info-alert {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-left: 4px solid #3b82f6;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin: 25px 0;
+        display: flex;
+        gap: 15px;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+
+        .info-alert i {
+            color: #1e40af;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+    .info-alert-content {
+        color: #1e40af;
+        font-size: 14px;
+    }
+
+        .info-alert-content strong {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        padding-top: 20px;
+        border-top: 2px solid #f1f5f9;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 14px 32px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+        .btn i {
+            font-size: 18px;
+        }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        padding: 35px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-top: 30px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+    }
+
+    .info-item {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+        .info-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+    .info-item-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 15px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+        .info-item-icon.primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .info-item-icon.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .info-item-icon.info {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+    .info-item-label {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .info-item-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+
+    .btn-view-resumes {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    }
+
+        .btn-view-resumes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            color: white;
+        }
+
+    .mb-4 {
+        margin-bottom: 1.5rem;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 30px 25px;
+        }
+
+            .page-header h2 {
+                font-size: 24px;
+            }
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+        }
+
+        .form-card {
+            padding: 30px 20px;
+        }
+
+        .info-card {
+            padding: 25px 20px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="edit-job-container">
+    <div class="page-header">
+        <div class="page-header-content">
+            <a asp-action="Index" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div class="header-icon">
+                <i class="bi bi-pencil-fill"></i>
             </div>
-            <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="RecruiterId" />
-
-                    <div class="mb-4">
-                        <label class="form-label">
-                            <i class="bi bi-tag-fill"></i> Job Title
-                        </label>
-                        <input asp-for="JobTitle"
-                               class="form-control form-control-lg"
-                               placeholder="e.g., Senior Software Engineer" />
-                        <span asp-validation-for="JobTitle" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label">
-                            <i class="bi bi-file-text-fill"></i> Job Description
-                        </label>
-                        <textarea asp-for="JobDescription"
-                                  class="form-control"
-                                  rows="8"
-                                  placeholder="Enter detailed job description, requirements, responsibilities, and qualifications..."></textarea>
-                        <span asp-validation-for="JobDescription" class="text-danger"></span>
-                        <small class="text-muted">Provide a comprehensive description to help candidates understand the role</small>
-                    </div>
-
-                    <div class="alert alert-info d-flex align-items-start">
-                        <i class="bi bi-info-circle me-2" style="font-size: 1.25rem;"></i>
-                        <div>
-                            <strong>Note:</strong> The assigned recruiter cannot be changed after creation.
-                            Current recruiter: <strong>@Model.Recruiter?.RecruiterName</strong>
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancel
-                        </a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Update Job Posting
-                        </button>
-                    </div>
-                </form>
+            <div>
+                <h2>Edit Job Posting</h2>
+                <p>Update the job posting details</p>
             </div>
         </div>
+    </div>
 
-        <div class="card mt-4">
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <i class="bi bi-calendar3 text-primary" style="font-size: 2rem;"></i>
-                        <p class="mb-0 mt-2 text-muted small">Job ID</p>
-                        <strong>#@Model.Id</strong>
-                    </div>
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <i class="bi bi-person text-success" style="font-size: 2rem;"></i>
-                        <p class="mb-0 mt-2 text-muted small">Recruiter</p>
-                        <strong>@Model.Recruiter?.RecruiterName</strong>
-                    </div>
-                    <div class="col-md-4">
-                        <i class="bi bi-files text-info" style="font-size: 2rem;"></i>
-                        <p class="mb-0 mt-2 text-muted small">Applications</p>
-                        <a asp-controller="Resume" asp-action="Index" asp-route-jobPostingId="@Model.Id" class="btn btn-sm btn-outline-primary mt-1">
-                            View Resumes
-                        </a>
-                    </div>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@TempData["Error"]</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="form-card">
+        <div class="form-section-title">
+            <i class="bi bi-briefcase-fill"></i>
+            Edit Job Details
+        </div>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="RecruiterId" />
+
+            <div class="form-group mb-4">
+                <label class="form-label">
+                    <i class="bi bi-tag-fill"></i>
+                    Job Title
+                </label>
+                <input asp-for="JobTitle"
+                       class="form-control form-control-lg"
+                       placeholder="e.g., Senior Software Engineer" />
+                <span asp-validation-for="JobTitle" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">
+                    <i class="bi bi-file-text-fill"></i>
+                    Job Description
+                </label>
+                <textarea asp-for="JobDescription"
+                          class="form-control"
+                          placeholder="Enter detailed job description, requirements, responsibilities, and qualifications..."></textarea>
+                <span asp-validation-for="JobDescription" class="text-danger"></span>
+                <div class="helper-text">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Provide a comprehensive description to help candidates understand the role</span>
+                </div>
+            </div>
+
+            <div class="info-alert">
+                <i class="bi bi-info-circle-fill"></i>
+                <div class="info-alert-content">
+                    <strong>Note:</strong>
+                    The assigned recruiter cannot be changed after creation. Current recruiter: <strong>@Model.Recruiter?.RecruiterName</strong>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Update Job Posting
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="info-card">
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-item-icon primary">
+                    <i class="bi bi-hash"></i>
+                </div>
+                <div class="info-item-label">Job ID</div>
+                <div class="info-item-value">#@Model.Id</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-item-icon success">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="info-item-label">Assigned Recruiter</div>
+                <div class="info-item-value">@Model.Recruiter?.RecruiterName</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-item-icon info">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                </div>
+                <div class="info-item-label">Applications</div>
+                <div class="info-item-value" style="margin-bottom: 0;">
+                    <a asp-controller="Resume" asp-action="Index" asp-route-jobPostingId="@Model.Id" class="btn-view-resumes">
+                        <i class="bi bi-eye-fill"></i>
+                        View Resumes
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .form-control-lg, .form-select-lg {
-        font-size: 1rem;
-        padding: 0.875rem 1rem;
-    }
-
-    .card {
-        border: none;
-        margin-bottom: 1.5rem;
-    }
-
-    .card-header {
-        background: linear-gradient(135deg, var(--warning-color), #d97706);
-        color: white;
-        font-weight: 600;
-        font-size: 1.125rem;
-        padding: 1rem 1.5rem;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-        .form-label i {
-            color: var(--primary-color);
-        }
-
-    textarea.form-control {
-        resize: vertical;
-        min-height: 150px;
-    }
-
-    .btn i {
-        margin-right: 0.25rem;
-    }
-
-    .alert-info {
-        background-color: #e0f2fe;
-        color: #075985;
-        border-left: 4px solid #0ea5e9;
-    }
-</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

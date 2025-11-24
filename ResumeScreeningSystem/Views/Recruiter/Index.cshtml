@@ -1,43 +1,580 @@
 ﻿@model IEnumerable<ResumeScreeningSystem.Models.Recruiter>
-
 @{
     ViewData["Title"] = "Recruiters";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Recruiters</h2>
+<style>
+    .recruiters-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
+    .page-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 16px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
 
-<a class="btn btn-primary mb-3" asp-action="Create">Add New Recruiter</a>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Jobs Assigned</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var recruiter in Model)
-        {
-            <tr>
-                <td>@recruiter.RecruiterName</td>
-                <td>@recruiter.Email</td>
-                <td>@(recruiter.JobPostings?.Count ?? 0)</td>
-                <td>
-                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@recruiter.Id">Edit</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@recruiter.Id">Delete</a>
-                </td>
-            </tr>
+        .page-header::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -100px;
+            right: -50px;
         }
-    </tbody>
-</table>
+
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header h2 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+        font-size: 16px;
+        opacity: 0.95;
+        margin-bottom: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .stats-summary {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .stat-badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 12px 20px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+        .stat-badge i {
+            font-size: 20px;
+        }
+
+    .btn-add-recruiter {
+        background: white;
+        color: #059669;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .btn-add-recruiter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            color: #047857;
+        }
+
+        .btn-add-recruiter i {
+            font-size: 18px;
+        }
+
+    .alert {
+        border: none;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        color: #166534;
+        border-left: 4px solid #22c55e;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+
+    .alert i {
+        font-size: 20px;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table thead {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        }
+
+            .table thead th {
+                color: white;
+                font-weight: 600;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 18px 20px;
+                border: none;
+            }
+
+                .table thead th i {
+                    margin-right: 6px;
+                    opacity: 0.9;
+                }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+        }
+
+            .table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .table tbody tr:hover {
+                background: #f8fafc;
+                transform: scale(1.01);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+        .table tbody td {
+            padding: 20px;
+            vertical-align: middle;
+            color: #334155;
+            font-size: 14px;
+        }
+
+    .recruiter-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .recruiter-avatar {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        flex-shrink: 0;
+    }
+
+    .recruiter-details {
+        flex: 1;
+    }
+
+    .recruiter-name {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 15px;
+        margin-bottom: 2px;
+    }
+
+    .recruiter-email {
+        color: #64748b;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .recruiter-email i {
+            font-size: 12px;
+        }
+
+    .jobs-badge {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: #1e40af;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+    }
+
+        .jobs-badge i {
+            font-size: 16px;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
+    }
+
+    .btn-action {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-action i {
+            font-size: 14px;
+        }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+        .btn-edit:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            color: white;
+        }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+        .btn-delete:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+        }
+
+    .table-footer {
+        background: #f8fafc;
+        padding: 20px 25px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .table-footer p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-footer i {
+            color: #10b981;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-state-icon {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+    }
+
+        .empty-state-icon i {
+            font-size: 60px;
+            color: #94a3b8;
+        }
+
+    .empty-state h4 {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+
+    .btn-create-first {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+        .btn-create-first:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 30px 25px;
+        }
+
+            .page-header h2 {
+                font-size: 24px;
+            }
+
+        .header-actions {
+            flex-direction: column;
+            gap: 15px;
+            align-items: stretch;
+        }
+
+        .stats-summary {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .stat-badge {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-add-recruiter {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .recruiter-info {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="recruiters-container">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="header-actions">
+                <div>
+                    <h2>Recruiters Management</h2>
+                    <p>Manage your recruitment team and their assignments</p>
+                </div>
+                <a class="btn-add-recruiter" asp-action="Create">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Add New Recruiter</span>
+                </a>
+            </div>
+            <div class="stats-summary">
+                <div class="stat-badge">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Total Recruiters: @Model.Count()</span>
+                </div>
+                <div class="stat-badge">
+                    <i class="bi bi-briefcase-fill"></i>
+                    <span>Total Jobs: @Model.Sum(r => r.JobPostings?.Count ?? 0)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>@TempData["Success"]</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@TempData["Error"]</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">
+                                <i class="bi bi-person-fill"></i>Recruiter
+                            </th>
+                            <th style="width: 30%;">
+                                <i class="bi bi-envelope-fill"></i>Contact
+                            </th>
+                            <th style="width: 15%;" class="text-center">
+                                <i class="bi bi-briefcase-fill"></i>Jobs
+                            </th>
+                            <th style="width: 15%;">
+                                <i class="bi bi-gear-fill"></i>Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var recruiter in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="recruiter-info">
+                                        <div class="recruiter-avatar">
+                                            @recruiter.RecruiterName.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <div class="recruiter-details">
+                                            <div class="recruiter-name">@recruiter.RecruiterName</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="recruiter-email">
+                                        <i class="bi bi-envelope"></i>
+                                        @recruiter.Email
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="jobs-badge">
+                                        <i class="bi bi-briefcase"></i>
+                                        @(recruiter.JobPostings?.Count ?? 0)
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a class="btn-action btn-edit" asp-action="Edit" asp-route-id="@recruiter.Id">
+                                            <i class="bi bi-pencil-fill"></i>
+                                            Edit
+                                        </a>
+                                        <a class="btn-action btn-delete" asp-action="Delete" asp-route-id="@recruiter.Id"
+                                           onclick="return confirm('Are you sure you want to delete this recruiter?')">
+                                            <i class="bi bi-trash-fill"></i>
+                                            Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <p>
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>Showing <strong>@Model.Count()</strong> recruiter(s)</span>
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <h4>No Recruiters Yet</h4>
+            <p>Get started by adding your first recruiter to manage job postings</p>
+            <a class="btn-create-first" asp-action="Create">
+                <i class="bi bi-person-plus-fill"></i>
+                <span>Add First Recruiter</span>
+            </a>
+        </div>
+    }
+</div>

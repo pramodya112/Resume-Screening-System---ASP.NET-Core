@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/Solution Items/">
+    <File Path=".gitattributes" />
     <File Path=".gitignore" />
   </Folder>
+  <Folder Name="/ViewModels/" />
   <Project Path="ResumeScreeningSystem/ResumeScreeningSystem.csproj" />
 </Solution>

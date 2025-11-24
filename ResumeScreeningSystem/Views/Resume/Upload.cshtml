@@ -6,8 +6,8 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="d-flex align-items-center mb-4">
-            <a asp-controller="JobPosting" asp-action="Index" class="btn btn-outline-secondary me-3">
-                <i class="bi bi-arrow-left"></i>
+            <a asp-controller="Resume" asp-action="Index" class="btn btn-outline-secondary me-3">
+                <i class="bi bi-arrow-left"></i> Back
             </a>
             <div>
                 <h2 class="mb-1">Upload Resume</h2>
@@ -63,7 +63,7 @@
 
                     <div class="upload-area mb-4">
                         <div class="upload-icon">
-                            <i class="bi bi-file-earmark-arrow-up"></i>
+                            📄
                         </div>
                         <h5 class="mb-2">Select Resume File</h5>
                         <p class="text-muted mb-3">Drag and drop or click to browse</p>
@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="alert alert-info d-flex align-items-start mb-4">
-                        <i class="bi bi-info-circle me-2" style="font-size: 1.25rem;"></i>
+                        <span style="font-size: 1.25rem; margin-right: 10px;">ℹ️</span>
                         <div>
                             <strong>Accepted Formats:</strong> PDF, DOC, DOCX<br />
                             <small>Maximum file size: 5MB</small>
@@ -86,11 +86,11 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a asp-controller="JobPosting" asp-action="Index" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancel
+                        <a asp-controller="Resume" asp-action="Index" class="btn btn-secondary">
+                            ❌ Cancel
                         </a>
                         <button type="submit" class="btn btn-primary" id="uploadBtn">
-                            <i class="bi bi-cloud-upload"></i> Upload Resume
+                            ☁️ Upload Resume
                         </button>
                     </div>
                 </form>
@@ -101,7 +101,7 @@
         <div class="card mt-4">
             <div class="card-body">
                 <h6 class="mb-3">
-                    <i class="bi bi-lightbulb text-warning"></i> Application Tips
+                    💡 Application Tips
                 </h6>
                 <ul class="mb-0 text-muted small">
                     <li>Ensure your resume is up-to-date with your latest experience</li>
@@ -117,22 +117,22 @@
 
 <style>
     .upload-area {
-        border: 3px dashed var(--border-color);
+        border: 3px dashed #dee2e6;
         border-radius: 1rem;
         padding: 3rem 2rem;
         text-align: center;
-        background: var(--bg-light);
+        background: #f8f9fa;
         transition: all 0.3s ease;
     }
 
         .upload-area:hover {
-            border-color: var(--primary-color);
-            background: rgba(37, 99, 235, 0.05);
+            border-color: #0d6efd;
+            background: rgba(13, 110, 253, 0.05);
         }
 
     .upload-icon {
         font-size: 4rem;
-        color: var(--primary-color);
+        color: #0d6efd;
         margin-bottom: 1rem;
     }
 
@@ -145,14 +145,15 @@
     .card-header {
         font-size: 1.125rem;
         font-weight: 600;
+        background-color: #f8f9fa;
     }
 
     .border-primary {
-        border: 2px solid rgba(37, 99, 235, 0.3) !important;
+        border: 2px solid rgba(13, 110, 253, 0.3) !important;
     }
 
     .bg-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+        background: linear-gradient(135deg, #0d6efd, #0a58ca) !important;
     }
 
     #fileName {
@@ -172,8 +173,7 @@
             const fileName = input.files[0].name;
             const fileSize = (input.files[0].size / 1024 / 1024).toFixed(2);
             fileNameDiv.innerHTML = `
-                <i class="bi bi-file-earmark-check"></i>
-                ${fileName} (${fileSize} MB)
+                ✅ ${fileName} (${fileSize} MB)
             `;
         } else {
             fileNameDiv.innerHTML = '';

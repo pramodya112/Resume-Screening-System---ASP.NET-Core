@@ -1,0 +1,143 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied - Resume Screening System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .access-denied-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: shake 0.5s;
+        }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        h1 {
+            color: #e74c3c;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .role-badge {
+            display: inline-block;
+            background: #f8f9fa;
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: #e74c3c;
+            font-weight: 600;
+            margin: 20px 0;
+            border: 2px solid #e74c3c;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+            .btn-back:hover {
+                background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                color: white;
+            }
+
+        .logout-link {
+            display: block;
+            margin-top: 20px;
+            color: #999;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+            .logout-link:hover {
+                color: #e74c3c;
+            }
+
+        .divider {
+            margin: 20px 0;
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="access-denied-container">
+        <div class="icon">🚫</div>
+        <h1>Access Denied</h1>
+        <p>You do not have permission to access this resource.</p>
+
+        <div class="role-badge">
+            Your Role: @Context.Session.GetString("UserRole")
+        </div>
+
+        <p style="font-size: 0.9rem; color: #999;">
+            This page is restricted to administrators only.
+        </p>
+
+        <a href="@Url.Action("Index", "Resume")" class="btn-back">
+            🏠 Go to Dashboard
+        </a>
+
+        <div class="divider">───────</div>
+
+        <a href="@Url.Action("Logout", "Account")" class="logout-link">
+            🚪 Logout
+        </a>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

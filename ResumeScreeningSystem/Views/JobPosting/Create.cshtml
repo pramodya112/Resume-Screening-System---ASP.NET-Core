@@ -1,31 +1,357 @@
 ﻿@model ResumeScreeningSystem.Models.JobPosting
-
 @{
     ViewData["Title"] = "Create Job Posting";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Create Job Posting</h2>
+<style>
+    .create-job-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
 
-<form asp-action="Create" method="post">
-    <div class="mb-3">
-        <label class="form-label">Title</label>
-        <input asp-for="JobTitle" class="form-control" />
-        <span asp-validation-for="JobTitle" class="text-danger"></span>
+    .page-header {
+        background: linear-gradient(135deg, #2a5298 0%, #7e22ce 100%);
+        border-radius: 16px;
+        padding: 40px;
+        margin-bottom: 35px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(42, 82, 152, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -150px;
+            right: -100px;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            bottom: -100px;
+            left: -50px;
+        }
+
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .header-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        backdrop-filter: blur(10px);
+    }
+
+    .page-header h2 {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+        font-size: 15px;
+        opacity: 0.95;
+        margin: 8px 0 0 0;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+    }
+
+    .form-section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .form-section-title i {
+            color: #2a5298;
+            font-size: 20px;
+        }
+
+    .form-group {
+        margin-bottom: 28px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 10px;
+        display: block;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+
+    .form-label-required::after {
+        content: '*';
+        color: #ef4444;
+        margin-left: 4px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 16px;
+        z-index: 1;
+    }
+
+    .form-control {
+        padding: 14px 16px 14px 45px;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        width: 100%;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+        .form-control:focus {
+            border-color: #2a5298;
+            box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+            outline: none;
+            background: white;
+        }
+
+        .form-control::placeholder {
+            color: #cbd5e1;
+        }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 150px;
+        line-height: 1.6;
+        padding: 14px 16px;
+    }
+
+    select.form-control {
+        padding: 14px 16px 14px 45px;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+    }
+
+    .text-danger {
+        color: #dc2626;
+        font-size: 13px;
+        margin-top: 6px;
+        display: block;
+        font-weight: 500;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        padding-top: 20px;
+        border-top: 2px solid #f1f5f9;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 14px 32px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+        .btn i {
+            font-size: 18px;
+        }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2a5298 0%, #7e22ce 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(42, 82, 152, 0.3);
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(42, 82, 152, 0.4);
+        }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+    .helper-text {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .helper-text i {
+            color: #94a3b8;
+        }
+
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 30px 25px;
+        }
+
+            .page-header h2 {
+                font-size: 24px;
+            }
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+        }
+
+        .form-card {
+            padding: 30px 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="create-job-container">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="header-icon">
+                <i class="bi bi-plus-circle-fill"></i>
+            </div>
+            <div>
+                <h2>Create Job Posting</h2>
+                <p>Add a new job position to start receiving applications</p>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea asp-for="JobDescription" class="form-control"></textarea>
-        <span asp-validation-for="JobDescription" class="text-danger"></span>
+
+    <div class="form-card">
+        <div class="form-section-title">
+            <i class="bi bi-briefcase-fill"></i>
+            Job Details
+        </div>
+
+        <form asp-action="Create" method="post">
+            <div class="form-group mb-3">
+                <label class="form-label form-label-required">Job Title</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-briefcase input-icon"></i>
+                    <input asp-for="JobTitle" class="form-control" placeholder="e.g. Senior Software Engineer" />
+                </div>
+                <span asp-validation-for="JobTitle" class="text-danger"></span>
+                <div class="helper-text">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Enter a clear and descriptive job title</span>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label form-label-required">Job Description</label>
+                <div class="input-wrapper">
+                    <textarea asp-for="JobDescription" class="form-control" placeholder="Describe the role, responsibilities, requirements, and qualifications..."></textarea>
+                </div>
+                <span asp-validation-for="JobDescription" class="text-danger"></span>
+                <div class="helper-text">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Provide detailed information about the position including responsibilities and requirements</span>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="RecruiterId" class="form-label form-label-required">Assigned Recruiter</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-person-fill input-icon"></i>
+                    <select asp-for="RecruiterId"
+                            asp-items="@(new SelectList(ViewBag.Recruiters, "Id", "RecruiterName"))"
+                            class="form-control">
+                        <option value="">-- Select Recruiter --</option>
+                    </select>
+                </div>
+                <span asp-validation-for="RecruiterId" class="text-danger"></span>
+                <div class="helper-text">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Choose the recruiter who will manage this job posting</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Create Job Posting
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
     </div>
-    <div class="form-group mb-3">
-        <label asp-for="RecruiterId" class="form-label">Recruiter</label>
-        <select asp-for="RecruiterId"
-                asp-items="@(new SelectList(ViewBag.Recruiters, "Id", "RecruiterName"))"
-                class="form-control">
-            <option value="">Select Recruiter</option>
-        </select>
-        <span asp-validation-for="RecruiterId" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-success">Create</button>
-</form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

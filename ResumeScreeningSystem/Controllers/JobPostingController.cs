@@ -20,7 +20,7 @@ namespace ResumeScreeningSystem.Controllers
         public IActionResult Index()
         {
             var jobs = _context.jobPostings
-            .Include(j=> j.Recruiter)
+            .Include(j => j.Recruiter)
             .ToList();
             return View(jobs);
         }
@@ -28,7 +28,7 @@ namespace ResumeScreeningSystem.Controllers
         public IActionResult Create()
         {
             var recruiters = _context.recruiters.ToList();
-            if(recruiters==null || !recruiters.Any())
+            if (recruiters == null || !recruiters.Any())
             {
                 TempData["Error"] = "No Recruiter availables. Please add a recruiter first";
                 return RedirectToAction("Index", "Recruiter");
@@ -39,7 +39,7 @@ namespace ResumeScreeningSystem.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] //attacks by ensuring the request originated from your web application.
         public IActionResult Create(JobPosting job)
         {
             if (!ModelState.IsValid)
@@ -55,44 +55,61 @@ namespace ResumeScreeningSystem.Controllers
 
         }
 
-        public IActionResult Edit( int id)
+        public IActionResult Edit(int id)
         {
             var job = _context.jobPostings.Find(id);
             if (job == null)
-            
-                     return NotFound();
+
+                return NotFound();
 
             return View(job);
-            
+
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit (JobPosting job)
+        public IActionResult Edit(JobPosting job)
         {
             if (!ModelState.IsValid)
                 return View();
 
             _context.jobPostings.Update(job);
-                _context.SaveChanges();
+            _context.SaveChanges();
             TempData["Success"] = "Job posting updated sucessfully";
             return RedirectToAction(nameof(Index));
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete (int id)
+        public IActionResult Delete(int id)
         {
-            var job = _context.jobPostings.Find(id);
+            var job = _context.jobPostings
+                .Include(j => j.Resumes)
+                .Include(j => j.ResumeScoresList)
+                .FirstOrDefault(j => j.Id == id);
+
             if (job == null)
             {
                 return NotFound();
             }
-                _context.jobPostings.Remove(job);
-                _context.SaveChanges();
-                TempData["Success"] = "Job posting Deleted sucessfully";
-                return RedirectToAction(nameof(Index));
-            
+
+            // Delete related resume scores first
+            if (job.ResumeScoresList != null && job.ResumeScoresList.Any())
+            {
+                _context.resumescores.RemoveRange(job.ResumeScoresList);
+            }
+
+            // Delete related resumes
+            if (job.Resumes != null && job.Resumes.Any())
+            {
+                _context.resumes.RemoveRange(job.Resumes);
+            }
+
+            // Finally delete the job posting
+            _context.jobPostings.Remove(job);
+            _context.SaveChanges();
+
+            TempData["Success"] = "Job posting deleted successfully";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

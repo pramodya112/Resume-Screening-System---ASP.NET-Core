@@ -3,50 +3,467 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container py-5">
-    <h2 class="text-center mb-5">AI Resume Screening</h2>
+<style>
+    .screening-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-    <form asp-action="AnalyzeAll" method="post" class="card shadow p-4 mb-4">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-8">
-                <label class="form-label fw-bold">Select Job Posting</label>
-                <select name="jobId" class="form-select form-select-lg" required onchange="toggleButtons(this)">
-                    <option value="">-- Choose a Job --</option>
+    .page-header {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        border-radius: 20px;
+        padding: 60px 40px;
+        margin-bottom: 40px;
+        color: white;
+        box-shadow: 0 15px 40px rgba(139, 92, 246, 0.3);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -150px;
+        }
+
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .header-icon {
+        width: 90px;
+        height: 90px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 45px;
+        margin: 0 auto 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .page-header h2 {
+        font-size: 42px;
+        font-weight: 800;
+        margin-bottom: 15px;
+        letter-spacing: -1px;
+    }
+
+    .page-header p {
+        font-size: 18px;
+        opacity: 0.95;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .main-card {
+        background: white;
+        border-radius: 20px;
+        padding: 45px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        margin-bottom: 30px;
+        border: 2px solid #f5f3ff;
+    }
+
+    .card-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .card-title i {
+            color: #8b5cf6;
+            font-size: 26px;
+        }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+        letter-spacing: 0.3px;
+    }
+
+        .form-label i {
+            color: #8b5cf6;
+            font-size: 18px;
+        }
+
+    .form-select {
+        padding: 16px 20px;
+        border-radius: 14px;
+        border: 3px solid #e2e8f0;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        cursor: pointer;
+        color: #334155;
+    }
+
+        .form-select:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 5px rgba(139, 92, 246, 0.1);
+            outline: none;
+            background: white;
+        }
+
+        .form-select option {
+            padding: 12px;
+            font-weight: 600;
+        }
+
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 35px;
+    }
+
+    .btn-analyze {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 18px 35px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .btn-analyze:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.45);
+        }
+
+        .btn-analyze:disabled {
+            background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-analyze i {
+            font-size: 20px;
+        }
+
+        .btn-analyze .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn-analyze.loading .spinner {
+            display: inline-block;
+        }
+
+        .btn-analyze.loading .btn-text {
+            display: none;
+        }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        border: none;
+        padding: 18px 35px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+    }
+
+        .btn-view:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.45);
+        }
+
+        .btn-view:disabled {
+            background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-view i {
+            font-size: 20px;
+        }
+
+    .info-section {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+        border-left: 5px solid #8b5cf6;
+        border-radius: 14px;
+        padding: 25px 30px;
+        margin-top: 40px;
+    }
+
+    .info-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #5b21b6;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .info-title i {
+            font-size: 22px;
+        }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .info-list li {
+            padding: 10px 0;
+            color: #4c1d95;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .info-list li i {
+                color: #8b5cf6;
+                font-size: 18px;
+                width: 24px;
+                text-align: center;
+            }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-top: 40px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.2);
+            border-color: #e9d5ff;
+        }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: white;
+        margin: 0 auto 20px;
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    .feature-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 10px;
+    }
+
+    .feature-desc {
+        font-size: 14px;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 40px 25px;
+        }
+
+            .page-header h2 {
+                font-size: 32px;
+            }
+
+        .header-icon {
+            width: 75px;
+            height: 75px;
+            font-size: 36px;
+        }
+
+        .main-card {
+            padding: 30px 20px;
+        }
+
+        .button-group {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="screening-container">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="header-icon">
+                <i class="bi bi-robot"></i>
+            </div>
+            <h2>AI Resume Screening</h2>
+            <p>Intelligent candidate analysis powered by artificial intelligence</p>
+        </div>
+    </div>
+
+    <div class="main-card">
+        <div class="card-title">
+            <i class="bi bi-sliders"></i>
+            Configure Analysis
+        </div>
+
+        <form asp-action="AnalyzeAll" method="post" id="analyzeForm">
+            <div>
+                <label class="form-label">
+                    <i class="bi bi-briefcase-fill"></i>
+                    Select Job Posting
+                </label>
+                <select name="jobId" class="form-select" required onchange="toggleButtons(this)" id="jobSelect">
+                    <option value="">-- Choose a Job Position --</option>
                     @foreach (var job in ViewBag.JobPostings)
                     {
                         <option value="@job.Id">@job.JobTitle</option>
                     }
                 </select>
             </div>
-            <div class="col-md-4 d-grid">
-                <button type="submit" class="btn btn-success btn-lg" id="analyzeBtn" disabled>
-                    Analyze All Resumes
+
+            <div class="button-group">
+                <button type="submit" class="btn-analyze" id="analyzeBtn" disabled>
+                    <div class="spinner"></div>
+                    <span class="btn-text">
+                        <i class="bi bi-cpu-fill"></i>
+                        Analyze All Resumes
+                    </span>
                 </button>
 
-                <script>
-    document.querySelector('form').addEventListener('submit', function () {
-        const btn = document.getElementById('analyzeBtn');
-        const text = document.getElementById('btnText');
-        const spinner = document.getElementById('spinner');
-        btn.disabled = true;
-        text.classList.add('d-none');
-        spinner.classList.remove('d-none');
-    });
-</script>
-
+                <button type="button" class="btn-view" id="viewBtn" disabled onclick="viewResults()">
+                    <i class="bi bi-bar-chart-fill"></i>
+                    View All Scores
+                </button>
             </div>
-        </div>
-    </form>
-
-    <div class="text-center">
-        <form asp-action="Results" method="get" id="viewForm">
-            <input type="hidden" name="jobId" id="viewJobId" />
-            <button type="submit" class="btn btn-outline-primary btn-lg" id="viewBtn" disabled>
-                View All Scores
-            </button>
         </form>
+
+        <div class="info-section">
+            <div class="info-title">
+                <i class="bi bi-info-circle-fill"></i>
+                How It Works
+            </div>
+            <ul class="info-list">
+                <li>
+                    <i class="bi bi-1-circle-fill"></i>
+                    Select a job posting from the dropdown above
+                </li>
+                <li>
+                    <i class="bi bi-2-circle-fill"></i>
+                    Click "Analyze All Resumes" to process all applications using AI
+                </li>
+                <li>
+                    <i class="bi bi-3-circle-fill"></i>
+                    Review the scoring results and make informed hiring decisions
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+            <div class="feature-title">Fast Processing</div>
+            <p class="feature-desc">Analyze multiple resumes in seconds with AI-powered technology</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="feature-title">Accurate Scoring</div>
+            <p class="feature-desc">Get precise match scores based on job requirements</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="feature-title">Smart Insights</div>
+            <p class="feature-desc">Receive detailed analysis and candidate rankings</p>
+        </div>
     </div>
 </div>
+
+<form asp-action="Results" method="get" id="viewForm" style="display: none;">
+    <input type="hidden" name="jobId" id="viewJobId" />
+</form>
 
 <script>
     function toggleButtons(select) {
@@ -54,6 +471,7 @@
         const analyzeBtn = document.getElementById('analyzeBtn');
         const viewBtn = document.getElementById('viewBtn');
         const viewInput = document.getElementById('viewJobId');
+
         if (jobId) {
             analyzeBtn.disabled = false;
             viewBtn.disabled = false;
@@ -63,4 +481,14 @@
             viewBtn.disabled = true;
         }
     }
+
+    function viewResults() {
+        document.getElementById('viewForm').submit();
+    }
+
+    document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+        const btn = document.getElementById('analyzeBtn');
+        btn.disabled = true;
+        btn.classList.add('loading');
+    });
 </script>

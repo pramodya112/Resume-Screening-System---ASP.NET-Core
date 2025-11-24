@@ -61,7 +61,7 @@ namespace ResumeScreeningSystem.Controllers
                 .Split(new char[] { ' ', ',', '.', '\n', '\r', '\t', ';', ':', '!', '?' }, StringSplitOptions.RemoveEmptyEntries)
                 ?? Array.Empty<string>();
 
-            var jobWordSet = new HashSet<string>(jobwords);
+            var jobWordSet = new HashSet<string>(jobwords); //used hashset because its fast
 
             // Delete existing scores for this job to avoid duplicates
             var existingScores = _context.resumescores.Where(rs => rs.JobPostingId == jobId);
@@ -73,7 +73,7 @@ namespace ResumeScreeningSystem.Controllers
                 var resumewords = resume.Extractedtext
                     .ToLower()
                     .Split(new char[] { ' ', ',', '.', '\n', '\r', '\t', ';', ':', '!', '?' }, StringSplitOptions.RemoveEmptyEntries)
-                    ?? Array.Empty<string>();
+                    ?? Array.Empty<string>(); //use an empty string array instead of crashing the program if the job description is null
 
                 var matchcount = resumewords.Count(w => jobWordSet.Contains(w));
                 var score = jobWordSet.Count > 0 ? (double)matchcount / jobWordSet.Count * 100 : 0;
