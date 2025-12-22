@@ -39,8 +39,13 @@ namespace ResumeScreeningSystem.Controllers
             }
             _context.recruiters.Add(recruiter);
             _context.SaveChanges();
+
+            TempData["ShowAlert"] = "Recruiter added successfully!";
             TempData["Success"] = "Recruiter created successfully";
+
             return RedirectToAction(nameof(Index));
+
+
         }
 
         public IActionResult Edit(int id)

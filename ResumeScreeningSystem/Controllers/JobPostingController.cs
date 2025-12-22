@@ -49,7 +49,9 @@ namespace ResumeScreeningSystem.Controllers
             }
             _context.jobPostings.Add(job);
             _context.SaveChanges();
-            TempData["Sucess"] = "Job posting created successfully";
+
+            TempData["ShowAlert"] = "Job posting created successfully!";
+            TempData["Success"] = "Job posting created successfully";
             return RedirectToAction("Index");
 
 

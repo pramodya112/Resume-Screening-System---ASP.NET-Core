@@ -49,6 +49,7 @@ namespace ResumeScreeningSystem.Controllers
                 HttpContext.Session.SetString("Username", model.Username);
                 HttpContext.Session.SetString("UserRole", "Admin");
 
+               TempData["ShowAlert"] = "Login successful!";
                 TempData["Success"] = "Welcome Admin!";
                 return RedirectToAction("Index", "JobPosting");
             }
